@@ -302,6 +302,15 @@ function register_pocket_api_settings() {
     register_setting( 'pocket-api-settings', 'pocket-api-last_sync' );
 }
 
+add_filter( 'update_option_pocket-api-interval', 'run_after_interval_change', 10, 2 );
+
+function run_after_interval_change( $old_value, $new_value )
+{
+    $timestamp = wp_next_scheduled('pocket_api_interval_action_hook');
+    wp_unschedule_event($timestamp,'pocket_api_interval_action_hook');
+    wp_reschedule_event(time(), 'every_n_minutes', 'pocket_api_interval_action_hook');
+}
+
 function pocket_api_options_page($action=""){
     ?>
 
