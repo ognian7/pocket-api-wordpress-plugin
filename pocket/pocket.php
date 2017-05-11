@@ -268,14 +268,45 @@ function pocket_api_interval_action() {
             }
         }
 
-        $id = wp_insert_post(array(post_author => $user->ID,
-            post_content => ($value->has_image == "1" ? '<img src="' . $value->image->src . '" /><br />' : '') . '<a href="' . $value->given_url . '">' . (trim($value->excerpt) == "" ? "read the original" : $value->excerpt) . '</a>' ,
-            post_title => $value->given_title,
-            post_status => get_option('pocket-api-status') == 'P' ? 'publish' : 'draft',
-            post_category => $cats,
-            guid => site_url() . '?p=3'), true);
+        $args = array(
+            'meta_query' => array(
+                array(
+                    'key' => 'pocket_id',
+                    'value' => $key,
+                    'compare' => '=',
+                )
+            )
+        );
+        $query = new WP_Query($args);
 
-        wp_set_post_tags($id, $tags, true);
+        if ($query->have_posts()) {
+            while($query->have_posts()) {
+                $query->the_post();
+                $id = get_the_ID();
+                wp_update_post(array(ID => $id,
+                    post_author => $user->ID,
+                    post_content => ($value->has_image == "1" ? '<img src="' . $value->image->src . '" /><br />' : '') . '<a href="' . $value->given_url . '">' . (trim($value->excerpt) == "" ? "read the original" : $value->excerpt) . '</a>' ,
+                    post_title => $value->given_title,
+                    post_status => get_option('pocket-api-status') == 'P' ? 'publish' : 'draft',
+                    post_category => $cats,
+                    guid => site_url() . '?p=3',
+                    meta_input => array(pocket_id => $key)), true);
+                wp_set_post_tags($id, $tags, true);
+            }
+        } else {
+
+            $id = wp_insert_post(array(post_author => $user->ID,
+                post_content => ($value->has_image == "1" ? '<img src="' . $value->image->src . '" /><br />' : '') . '<a href="' . $value->given_url . '">' . (trim($value->excerpt) == "" ? "read the original" : $value->excerpt) . '</a>' ,
+                post_title => $value->given_title,
+                post_status => get_option('pocket-api-status') == 'P' ? 'publish' : 'draft',
+                post_category => $cats,
+                guid => site_url() . '?p=3',
+                meta_input => array(pocket_id => $key)), true);
+
+            wp_set_post_tags($id, $tags, true);
+        }
+
+
     }
 
 }
