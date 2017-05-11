@@ -216,7 +216,8 @@ function pocket_api_interval_action() {
 
 //////////////////////////
     $t = get_option('pocket-api-last_sync', 0);
-    update_option( 'pocket-api-last_sync', time());
+
+    $current_time = time();
 
     $request5_url = 'https://getpocket.com/v3/get';
 
@@ -252,6 +253,8 @@ function pocket_api_interval_action() {
     $result = json_decode($server_output);
 
     $user = get_user_by( 'login', get_option('pocket-api-wp-username') );
+
+    update_option( 'pocket-api-last_sync', $current_time);
 
     foreach ($result->list as $key=>$value) {
 
