@@ -266,7 +266,7 @@ function pocket_api_interval_action() {
         }
 
         $id = wp_insert_post(array(post_author => $user->ID,
-            post_content => ($value->has_image == "1" ? '<img src="' . $value->image->src . '" /><br />' : '') . '"<a href="' . $value->given_url . '">' . $value->excerpt . '</a>' ,
+            post_content => ($value->has_image == "1" ? '<img src="' . $value->image->src . '" /><br />' : '') . '<a href="' . $value->given_url . '">' . (trim($value->excerpt) == "" ? "read the original" : $value->excerpt) . '</a>' ,
             post_title => $value->given_title,
             post_status => get_option('pocket-api-status') == 'P' ? 'publish' : 'draft',
             post_category => $cats,
